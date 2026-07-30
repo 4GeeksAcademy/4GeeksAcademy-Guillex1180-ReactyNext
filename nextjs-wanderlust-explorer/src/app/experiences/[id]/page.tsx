@@ -1,126 +1,165 @@
 "use client";
 
-import { useEffect } from "react";
-import { notFound, useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Heart, MapPin, Star, Tag } from "lucide-react";
+import {
+  ArrowLeft,
+  MapPin,
+  Star,
+  DollarSign,
+  Heart,
+} from "lucide-react";
 import { experiences } from "@/data/experiences";
 import { useFavorites } from "@/hooks/useFavorites";
+import type { Experience } from "@/data/experiences";
 
 export default function ExperienceDetailPage() {
-  const params = useParams<{ id: string }>();
+  const params = useParams();
+  const router = useRouter();
   const { isFavorite, toggleFavorite } = useFavorites();
+  const [experience, setExperience] = useState<Experience | null>(null);
 
-  const experience = experiences.find((exp) => exp.id === params.id);
+  const id = params.id as string;
+
+  useEffect(() => {
+    const found = experiences.find((exp) => exp.id === id);
+    setExperience(found ?? null);
+    if (found) {
+      document.title = `${found.title} — Wanderlust Labs`;
+    }
+  }, [id]);
 
   if (!experience) {
-    notFound();
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center">
+        <div className="mb-4 text-6xl">🗺️</div>
+        <h2 className="text-xl font-semibold text-zinc-700 dark:text-zinc-300">
+          Experiencia no encontrada
+        </h2>
+        <p className="mt-1 text-zinc-500 dark:text-zinc-400">
+          La experiencia que buscas no existe o ha sido eliminada.
+        </p>
+        <Link
+          href="/experiences"
+          className="mt-6 flex items-center gap-2 rounded-full bg-emerald-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Volver a experiencias
+        </Link>
+      </div>
+    );
   }
 
   const fav = isFavorite(experience.id);
 
-  // ── Update document title dynamically ───────────────────────────
-  useEffect(() => {
-    document.title = `${experience.title} — Wanderlust Labs`;
-    return () => {
-      document.title = "Wanderlust Labs — Explorer";
-    };
-  }, [experience.title]);
-
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
       {/* Back button */}
-      <Link
-        href="/experiences"
-        className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-zinc-600 transition-colors hover:text-rose-600"
+      <button
+        onClick={() => router.back()}
+        className="mb-6 flex items-center gap-2 text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
       >
         <ArrowLeft className="h-4 w-4" />
-        Back to experiences
-      </Link>
+        Volver
+      </button>
 
-      {/* Main image */}
-      <div className="relative mb-8 aspect-[16/9] overflow-hidden rounded-2xl">
+      {/* Hero image */}
+      <div className="relative mb-8 aspect-[2/1] overflow-hidden rounded-2xl">
         <Image
           src={experience.imageUrl}
           alt={experience.title}
           fill
           className="object-cover"
           priority
-          sizes="(max-width: 768px) 100vw, 896px"
+          sizes="(max-width: 1024px) 100vw, 1024px"
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+
+        {/* Category badge */}
+        <span className="absolute left-6 top-6 rounded-full bg-white/90 px-4 py-1.5 text-sm font-semibold text-zinc-800 backdrop-blur-sm dark:bg-zinc-900/90 dark:text-zinc-200">
+          {experience.category}
+        </span>
+
+        {/* Favorite button */}
+        <button
+          onClick={() => toggleFavorite(experience.id)}
+          className="absolute right-6 top-6 flex h-10 w-10 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm transition-colors hover:bg-white dark:bg-zinc-900/80 dark:hover:bg-zinc-900"
+          aria-label={fav ? "Remove from favorites" : "Add to favorites"}
+        >
+          <Heart
+            className={`h-5 w-5 ${
+              fav ? "fill-red-500 text-red-500" : "text-zinc-600 dark:text-zinc-400"
+            }`}
+          />
+        </button>
+
+        {/* Title overlay */}
+        <div className="absolute bottom-6 left-6 right-6">
+          <h1 className="text-3xl font-bold text-white drop-shadow-lg sm:text-4xl">
+            {experience.title}
+          </h1>
+          <div className="mt-2 flex flex-wrap items-center gap-4 text-sm text-white/80">
+            <div className="flex items-center gap-1">
+              <MapPin className="h-4 w-4" />
+              {experience.destination}
+            </div>
+            <div className="flex items-center gap-1">
+              <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+              {experience.rating}
+            </div>
+          </div>
+        </div>
       </div>
 
+      {/* Content */}
       <div className="grid gap-8 lg:grid-cols-3">
-        {/* Left column — details */}
+        {/* Description */}
         <div className="lg:col-span-2">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-zinc-900 sm:text-3xl">
-                {experience.title}
-              </h1>
-              <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-zinc-500">
-                <span className="flex items-center gap-1">
-                  <MapPin className="h-4 w-4 text-zinc-400" />
-                  {experience.destination}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Tag className="h-4 w-4 text-zinc-400" />
-                  <span className="capitalize">{experience.category}</span>
-                </span>
-                <span className="flex items-center gap-1">
-                  <Star className="h-4 w-4 text-amber-400" />
-                  {experience.rating} rating
-                </span>
-              </div>
-            </div>
-
-            <button
-              onClick={() => toggleFavorite(experience.id)}
-              aria-label={fav ? "Remove from favorites" : "Add to favorites"}
-              className="shrink-0 flex items-center gap-2 rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium transition-all hover:bg-zinc-50"
-            >
-              <Heart
-                className={`h-5 w-5 ${
-                  fav ? "fill-rose-500 text-rose-500" : "text-zinc-400"
-                }`}
-              />
-              {fav ? "Saved" : "Save"}
-            </button>
-          </div>
-
-          <p className="mt-6 text-base leading-relaxed text-zinc-700">
+          <h2 className="mb-4 text-2xl font-semibold text-zinc-900 dark:text-white">
+            Acerca de esta experiencia
+          </h2>
+          <p className="leading-relaxed text-zinc-600 dark:text-zinc-400">
             {experience.description}
           </p>
         </div>
 
-        {/* Right column — price card */}
+        {/* Sidebar card */}
         <div className="lg:col-span-1">
-          <div className="sticky top-24 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
-            <div className="text-center">
-              <span className="text-3xl font-bold text-zinc-900">
+          <div className="sticky top-24 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="mb-4">
+              <span className="text-3xl font-bold text-zinc-900 dark:text-white">
                 ${experience.price}
               </span>
-              <span className="text-sm text-zinc-500"> / person</span>
+              <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                /persona
+              </span>
             </div>
 
-            <div className="mt-4 flex items-center justify-center gap-1 text-sm text-zinc-600">
-              <Star className="h-4 w-4 text-amber-400" />
-              <span className="font-semibold">{experience.rating}</span>
-              <span className="text-zinc-400">· Excellent</span>
+            <div className="mb-6 space-y-3 text-sm">
+              <div className="flex items-center justify-between border-b border-zinc-100 pb-2 dark:border-zinc-800">
+                <span className="text-zinc-500 dark:text-zinc-400">Destino</span>
+                <span className="font-medium text-zinc-900 dark:text-white">
+                  {experience.destination}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-zinc-500 dark:text-zinc-400">Rating</span>
+                <span className="flex items-center gap-1 font-medium text-zinc-900 dark:text-white">
+                  <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                  {experience.rating}
+                </span>
+              </div>
             </div>
 
-            <button
-              onClick={() => toggleFavorite(experience.id)}
-              className={`mt-6 flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold transition-all ${
-                fav
-                  ? "border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100"
-                  : "bg-rose-500 text-white shadow-sm hover:bg-rose-600"
-              }`}
+            <Link
+              href="/experiences"
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-emerald-700"
             >
-              <Heart className={`h-4 w-4 ${fav ? "fill-rose-500" : ""}`} />
-              {fav ? "Remove from Saved" : "Save Experience"}
-            </button>
+              <DollarSign className="h-4 w-4" />
+              Reservar ahora
+            </Link>
           </div>
         </div>
       </div>

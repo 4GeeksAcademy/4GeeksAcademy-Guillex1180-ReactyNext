@@ -1,62 +1,28 @@
 "use client";
 
-import { Search, X } from "lucide-react";
-import { useState, useEffect, useTransition, useCallback } from "react";
-import { useExperiences } from "@/hooks/useExperiences";
+import { Search } from "lucide-react";
 
-export default function SearchBar() {
-  const { filters, setFilter } = useExperiences();
-  const [isPending, startTransition] = useTransition();
+interface Props {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+}
 
-  const currentSearch = filters.search;
-  const [inputValue, setInputValue] = useState(currentSearch);
-
-  // Sync input when URL changes externally (e.g. browser back/forward)
-  useEffect(() => {
-    setInputValue(currentSearch);
-  }, [currentSearch]);
-
-  const updateSearch = useCallback(
-    (term: string) => {
-      startTransition(() => {
-        setFilter("search", term);
-      });
-    },
-    [setFilter],
-  );
-
-  const clearSearch = useCallback(() => {
-    setInputValue("");
-    updateSearch("");
-  }, [updateSearch]);
-
+export default function SearchBar({
+  value,
+  onChange,
+  placeholder = "Buscar experiencias... (soporta regex)",
+}: Props) {
   return (
-    <div className="relative w-full max-w-md">
-      <Search
-        className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 ${
-          isPending ? "text-rose-400" : "text-zinc-400"
-        }`}
-      />
+    <div className="relative">
+      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
       <input
         type="text"
-        placeholder="Search experiences..."
-        value={inputValue}
-        onChange={(e) => {
-          const val = e.target.value;
-          setInputValue(val);
-          updateSearch(val);
-        }}
-        className="w-full rounded-full border border-zinc-200 bg-white py-2.5 pl-10 pr-10 text-sm text-zinc-900 placeholder-zinc-400 shadow-sm outline-none transition-all focus:border-rose-300 focus:ring-2 focus:ring-rose-100"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full rounded-xl border border-zinc-300 bg-white py-2.5 pl-10 pr-4 text-sm text-zinc-900 placeholder-zinc-400 transition-colors focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500 dark:focus:border-emerald-400"
       />
-      {inputValue && (
-        <button
-          onClick={clearSearch}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
-          aria-label="Clear search"
-        >
-          <X className="h-4 w-4" />
-        </button>
-      )}
     </div>
   );
 }

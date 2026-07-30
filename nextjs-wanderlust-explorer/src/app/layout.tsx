@@ -14,8 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Wanderlust Labs — Explorer",
-  description: "Discover unique travel experiences around the world",
+  title: "Wanderlust Labs — Explora el mundo",
+  description:
+    "Descubre experiencias de viaje únicas alrededor del mundo. Explora, guarda favoritos y planifica tu próxima aventura.",
 };
 
 export default function RootLayout({
@@ -25,10 +26,10 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="es"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-zinc-50 text-zinc-900">
+      <body className="min-h-full flex flex-col bg-zinc-50 font-sans dark:bg-black">
         <Navbar />
         <main className="flex-1">{children}</main>
       </body>

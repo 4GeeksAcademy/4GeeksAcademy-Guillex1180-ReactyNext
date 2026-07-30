@@ -1,83 +1,104 @@
 "use client";
 
-import Link from "next/link";
-import { User, Heart, Compass, Mail, Settings } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
+import { User, Mail, Heart, MapPin, Compass } from "lucide-react";
 
 export default function ProfilePage() {
-  const { favoriteIds, isLoaded } = useFavorites();
+  const { totalFavorites } = useFavorites();
+
+  const user = {
+    name: "Alex Wanderlust",
+    email: "alex@wanderlustlabs.com",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex&backgroundColor=10b981",
+    location: "Bogotá, Colombia",
+    memberSince: "Enero 2025",
+  };
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
-      <h1 className="text-2xl font-bold text-zinc-900 sm:text-3xl">Profile</h1>
-
+    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
       {/* Profile card */}
-      <div className="mt-6 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
-        {/* Banner */}
-        <div className="h-24 bg-gradient-to-r from-rose-400 to-amber-400" />
+      <div className="mb-8 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        {/* Cover */}
+        <div className="h-32 bg-gradient-to-r from-emerald-400 to-emerald-600" />
 
-        {/* Avatar & info */}
-        <div className="px-6 pb-6">
-          <div className="-mt-10 flex items-end gap-4">
-            <div className="flex h-20 w-20 items-center justify-center rounded-full border-4 border-white bg-zinc-100 shadow-sm">
-              <User className="h-10 w-10 text-zinc-400" />
+        <div className="relative px-6 pb-6">
+          {/* Avatar */}
+          <div className="relative -mt-16 mb-4 flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-emerald-100 shadow-lg dark:border-zinc-900">
+            <img
+              src={user.avatar}
+              alt={user.name}
+              className="h-full w-full object-cover"
+            />
+          </div>
+
+          <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">
+            {user.name}
+          </h2>
+
+          <div className="mt-2 space-y-1.5 text-sm text-zinc-500 dark:text-zinc-400">
+            <div className="flex items-center gap-2">
+              <Mail className="h-4 w-4" />
+              {user.email}
             </div>
-            <div className="pb-1">
-              <h2 className="text-lg font-bold text-zinc-900">Traveler</h2>
-              <p className="flex items-center gap-1 text-sm text-zinc-500">
-                <Mail className="h-3.5 w-3.5" />
-                traveler@wanderlust-labs.com
-              </p>
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              {user.location}
+            </div>
+            <div className="flex items-center gap-2">
+              <Compass className="h-4 w-4" />
+              Miembro desde {user.memberSince}
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Stats grid */}
-        <div className="grid grid-cols-2 border-t border-zinc-100">
-          <Link
-            href="/favorites"
-            className="flex flex-col items-center gap-1 border-r border-zinc-100 py-6 transition-colors hover:bg-rose-50"
-          >
-            <Heart className="h-5 w-5 text-rose-400" />
-            <span className="text-2xl font-bold text-zinc-900">
-              {isLoaded ? favoriteIds.length : "..."}
-            </span>
-            <span className="text-xs text-zinc-500">Saved</span>
-          </Link>
-          <Link
-            href="/experiences"
-            className="flex flex-col items-center gap-1 py-6 transition-colors hover:bg-amber-50"
-          >
-            <Compass className="h-5 w-5 text-amber-400" />
-            <span className="text-2xl font-bold text-zinc-900">100</span>
-            <span className="text-xs text-zinc-500">Experiences</span>
-          </Link>
+      {/* Stats */}
+      <div className="grid gap-6 sm:grid-cols-3">
+        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition-colors hover:border-emerald-200 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-emerald-800">
+          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-950">
+            <Heart className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+          </div>
+          <p className="text-2xl font-bold text-zinc-900 dark:text-white">
+            {totalFavorites}
+          </p>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            Favoritos
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition-colors hover:border-blue-200 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-blue-800">
+          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-950">
+            <Compass className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          </div>
+          <p className="text-2xl font-bold text-zinc-900 dark:text-white">12</p>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">Viajes realizados</p>
+        </div>
+
+        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition-colors hover:border-amber-200 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-amber-800">
+          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-950">
+            <MapPin className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+          </div>
+          <p className="text-2xl font-bold text-zinc-900 dark:text-white">8</p>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">Países visitados</p>
         </div>
       </div>
 
-      {/* Quick links */}
-      <div className="mt-6 space-y-2">
-        <Link
-          href="/favorites"
-          className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white p-4 text-sm font-medium text-zinc-700 transition-all hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700"
-        >
-          <Heart className="h-5 w-5 text-rose-400" />
-          View Saved Experiences
-          <span className="ml-auto text-xs text-zinc-400">
-            {isLoaded ? favoriteIds.length : "..."} items
-          </span>
-        </Link>
-        <Link
-          href="/experiences"
-          className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white p-4 text-sm font-medium text-zinc-700 transition-all hover:border-amber-200 hover:bg-amber-50 hover:text-amber-700"
-        >
-          <Compass className="h-5 w-5 text-amber-400" />
-          Browse All Experiences
-        </Link>
-        <div className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white p-4 text-sm font-medium text-zinc-400">
-          <Settings className="h-5 w-5 text-zinc-300" />
-          Settings
-          <span className="ml-auto text-xs text-zinc-300">Coming soon</span>
+      {/* Favorite destinations */}
+      <div className="mt-8 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <h3 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-white">
+          Destinos favoritos
+        </h3>
+        <div className="flex flex-wrap gap-2">
+          {["Japón", "Italia", "Tailandia", "Islandia", "Perú", "Francia"].map(
+            (dest) => (
+              <span
+                key={dest}
+                className="rounded-full bg-zinc-100 px-3 py-1 text-sm font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+              >
+                {dest}
+              </span>
+            )
+          )}
         </div>
       </div>
     </div>
